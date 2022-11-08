@@ -1,0 +1,485 @@
+--We define an employee's total earnings to be their monthly  worked, and the maximum total earnings to be the maximum total earnings for any employee in the Employee table. Write a query to find the maximum total earnings for all employees as well as the total number of employees who have maximum total earnings. Then print these values as  space-separated integers.
+
+SELECT 
+(salary*months) AS total_earnings 
+, COUNT(name)
+FROM Employee
+GROUP BY (salary*months)
+ORDER BY COUNT(name) DESC
+LIMIT 1
+
+--The sum of all values in LAT_N rounded to a scale of  decimal places.The sum of all values in LONG_W rounded to a scale of  decimal places.
+
+SELECT 
+    ROUND(SUM(LAT_N),2)
+    , ROUND(SUM(LONG_W),2)
+FROM 
+STATION
+
+--Query the sum of Northern Latitudes (LAT_N) from STATION having values greater than  and less than . Truncate your answer to  decimal places.
+
+SELECT 
+   TRUNCATE(SUM(LAT_N),4)
+FROM STATION 
+WHERE 
+    LAT_N > 38.7880 AND LAT_N < 137.2345
+
+--Query the greatest value of the Northern Latitudes (LAT_N) from STATION that is less than . Truncate your answer to  decimal places.
+
+SELECT 
+TRUNCATE (MAX(LAT_N),4)
+FROM STATION 
+WHERE LAT_N < 137.2345
+
+--Query the Western Longitude (LONG_W) for the largest Northern Latitude (LAT_N) in STATION that is less than . Round your answer to  decimal places.
+
+SELECT 
+ROUND(LONG_W,4)
+FROM STATION 
+WHERE LAT_N = (
+                SELECT MAX(LAT_N) 
+                FROM STATION 
+                WHERE LAT_N < 137.2345
+                )
+--Query the smallest Northern Latitude (LAT_N) from STATION that is greater than . Round your answer to  decimal places.
+
+SELECT 
+ROUND(MIN(LAT_N),4)
+FROM STATION 
+WHERE 
+LAT_N > 38.7780
+
+--Query the Western Longitude (LONG_W)where the smallest Northern Latitude (LAT_N) in STATION is greater than . Round your answer to  decimal places.
+
+SELECT 
+ROUND(LONG_W,4)
+FROM STATION 
+WHERE LAT_N = (SELECT 
+            MIN(LAT_N)
+            FROM STATION 
+            WHERE LAT_N > 38.7780)
+            
+--Query the Manhattan Distance between points  and  and round it to a scale of  decimal places.
+
+SELECT 
+ABS(ROUND((MIN(LAT_N)-MAX(LAT_N)) + (MIN(LONG_W)-MAX(LONG_W)),4))
+FROM STATION
+
+--Query the Euclidean Distance 
+
+SELECT 
+ROUND(
+    (SQRT
+     (POWER(
+          (MAX(LAT_N) - MIN(LAT_N)),
+          2) 
+      + 
+      POWER(
+          (MAX(LONG_W) - MIN(LONG_W)),
+          2)
+     )
+     )
+    ,4)
+
+--Given the CITY and COUNTRY tables, query the sum of the populations of all cities where the CONTINENT is 'Asia'.
+
+SELECT 
+SUM(CY.POPULATION)
+FROM CITY CY
+LEFT JOIN COUNTRY CT
+ON CY.COUNTRYCODE = CT.CODE 
+WHERE CT.CONTINENT = "Asia";
+
+--Given the CITY and COUNTRY tables, query the names of all cities where the CONTINENT is 'Africa'
+
+SELECT 
+CY.NAME
+FROM CITY CY
+LEFT JOIN COUNTRY CT
+ON CY.COUNTRYCODE = CT.CODE 
+WHERE CT.CONTINENT = "Africa";
+
+--Given the CITY and COUNTRY tables, query the names of all the continents (COUNTRY.Continent) and their respective average city populations (CITY.Population) rounded down to the nearest integer.
+
+SELECT 
+CT.CONTINENT
+, FLOOR(AVG(CY.POPULATION))
+FROM CITY CY
+INNER JOIN COUNTRY CT
+ON CY.COUNTRYCODE = CT.CODE 
+GROUP BY CT. CONTINENT
+
+--Ketty gives Eve a task to generate a report containing three columns: Name, Grade and Mark. Ketty doesn't want the NAMES of those students who received a grade lower than 8. The report must be in descending order by grade -- i.e. higher grades are entered first. If there is more than one student with the same grade (8-10) assigned to them, order those particular students by their name alphabetically. Finally, if the grade is lower than 8, use "NULL" as their name and list them by their grades in descending order. If there is more than one student with the same grade (1-7) assigned to them, order those particular students by their marks in ascending order.
+
+SELECT 
+CASE 
+ WHEN g.grade < 8 THEN NULL
+ ELSE s.name 
+ END AS student_name
+, grade
+, marks 
+FROM students s 
+LEFT JOIN grades g 
+ON s.marks between g.min_mark AND g.max_mark
+ORDER BY grade DESC, student_name ASC
+
+
+--Query all columns for all American cities in the CITY table with populations larger than 100000. The CountryCode for America is USA.
+
+SELECT * 
+FROM city 
+WHERE countrycode = 'USA'
+AND population > 100000
+
+--Query the NAME field for all American cities in the CITY table with populations larger than 120000. The CountryCode for America is USA.
+SELECT 
+name 
+FROM city 
+WHERE population > 120000 AND countrycode='USA'
+
+--Query all columns (attributes) for every row in the CITY table.
+SELECT 
+*
+FROM City
+
+
+--Query all columns for a city in CITY with the ID 1661.
+SELECT 
+*
+FROM City 
+WHERE ID = 1661
+
+--Query all attributes of every Japanese city in the CITY table. The COUNTRYCODE for Japan is JPN.
+SELECT 
+* 
+FROM CITY 
+WHERE countrycode='JPN'
+
+--Query the names of all the Japanese cities in the CITY table. The COUNTRYCODE for Japan is JPN.
+SELECT 
+name 
+FROM city 
+WHERE countrycode='JPN'
+
+--Query a list of CITY and STATE from the STATION table. The STATION table is described as follows:
+SELECT 
+city
+, state 
+FROM station
+
+--Query a list of CITY names from STATION for cities that have an even ID number. Print the results in any order, but exclude duplicates from the answer.
+SELECT DISTINCT 
+city 
+FROM STATION 
+WHERE MOD(ID,2) = 0 ;
+
+--Find the difference between the total number of CITY entries in the table and the number of distinct CITY entries in the table.
+SELECT 
+COUNT(city) - COUNT(DISTINCT(city))
+FROM station
+
+--Query the two cities in STATION with the shortest and longest CITY names, as well as their respective lengths (i.e.: number of characters in the name). If there is more than one smallest or largest city, choose the one that comes first when ordered alphabetically.
+SELECT 
+City, 
+LENGTH(City)
+FROM Station
+GROUP BY City
+ORDER BY 2 ASC, 1 ASC
+LIMIT 1;
+
+SELECT 
+City, 
+LENGTH(City)
+FROM Station
+GROUP BY City
+ORDER BY 2 DESC, 1 ASC
+LIMIT 1;
+
+--Query the list of CITY names starting with vowels (i.e., a, e, i, o, or u) from STATION. Your result cannot contain duplicates.
+SELECT DISTINCT
+city 
+FROM station 
+WHERE LEFT(city,1) IN ('A','E','I','O','U')
+
+--Query the list of CITY names ending with vowels (a, e, i, o, u) from STATION. Your result cannot contain duplicates.
+SELECT DISTINCT
+city 
+FROM station 
+WHERE RIGHT(city,1) IN ('a','e','i','o','u')
+
+--Query the list of CITY names from STATION which have vowels (i.e., a, e, i, o, and u) as both their first and last characters. Your result cannot contain duplicates.
+SELECT DISTINCT
+city 
+FROM station 
+WHERE LEFT(city,1) IN ('A','E','I','O','U')
+AND RIGHT(city,1) IN ('a','e','i','o','u')
+
+--Query the list of CITY names from STATION that do not start with vowels. Your result cannot contain duplicates.
+SELECT DISTINCT
+city 
+FROM station 
+WHERE LEFT(city,1) NOT IN ('A','E','I','O','U')
+
+--Query the list of CITY names from STATION that do not end with vowels. Your result cannot contain duplicates.
+SELECT DISTINCT
+city 
+FROM station 
+WHERE RIGHT(city,1) NOT IN ('a','e','i','o','u')
+
+--Query the list of CITY names from STATION that either do not start with vowels or do not end with vowels. Your result cannot contain duplicates.
+SELECT DISTINCT
+city 
+FROM station 
+WHERE LEFT(city,1) NOT IN ('A','E','I','O','U')
+OR RIGHT(city,1) NOT IN ('a','e','i','o','u')
+
+--Query the list of CITY names from STATION that do not start with vowels and do not end with vowels. Your result cannot contain duplicates.
+SELECT DISTINCT
+city 
+FROM station 
+WHERE LEFT(city,1) NOT IN ('A','E','I','O','U')
+AND RIGHT(city,1) NOT IN ('a','e','i','o','u')
+
+--Query the Name of any student in STUDENTS who scored higher than 75 Marks. Order your output by the last three characters of each name. If two or more students both have names ending in the same last three characters (i.e.: Bobby, Robby, etc.), secondary sort them by ascending ID.
+SELECT 
+name 
+FROM 
+students 
+WHERE Marks > 75 
+ORDER BY RIGHT(name,3) ASC, ID ASC
+
+
+--Write a query that prints a list of employee names (i.e.: the name attribute) from the Employee table in alphabetical order.
+SELECT 
+name 
+FROM employee
+ORDER BY name ASC
+
+--Write a query that prints a list of employee names (i.e.: the name attribute) for employees in Employee having a salary greater than  per month who have been employees for less than  months. Sort your result by ascending employee_id.
+SELECT 
+name 
+FROM 
+employee 
+WHERE 
+salary >2000 
+AND 
+months <10
+
+--Write a query identifying the type of each record in the TRIANGLES table using its three side lengths. Output one of the following statements for each record in the table:
+
+Equilateral: It's a triangle with  sides of equal length.
+Isosceles: It's a triangle with  sides of equal length.
+Scalene: It's a triangle with  sides of differing lengths.
+Not A Triangle: The given values of A, B, and C don't form a triangle.
+
+SELECT 
+CASE 
+    WHEN (A = B AND A = C AND B = C) THEN 'Equilateral'
+    WHEN (A = B OR A = C OR B = C) AND (A+B > C) THEN 'Isosceles'
+    WHEN (A != B AND A != C AND B != C) AND (A+B > C )THEN 'Scalene'
+    ELSE 'Not A Triangle'
+    END AS 'Triangles Names'
+    FROM Triangles;
+
+--Query a count of the number of cities in CITY having a Population larger than…Query the total population of all cities in CITY where District is California.
+SELECT 
+COUNT(name)
+FROM CITY 
+WHERE population >100000
+SELECT 
+SUM(population)
+FROM city 
+WHERE district = 'California'
+
+--Query the average population of all cities in CITY where District is California.
+SELECT 
+AVG(population)
+FROM city 
+WHERE district = 'California'
+
+--Query the average population for all cities in CITY, rounded down to the nearest integer.
+SELECT 
+FLOOR(AVG(population))
+FROM city
+
+
+--Query the sum of the populations for all Japanese cities in CITY. The COUNTRYCODE for Japan is JPN
+SELECT 
+SUM(population)
+FROM city 
+WHERE countrycode = 'JPN'
+
+--Query the difference between the maximum and minimum populations in CITY.
+SELECT 
+MAX(population) - MIN(population)
+FROM city
+
+--Write a query calculating the amount of error (i.e.:  average monthly salaries), and round it up to the next integer.
+SELECT 
+CEILING(AVG(salary - REPLACE(salary,0,'')))
+FROM 
+employees
+
+--Write a query to find the maximum total earnings for all employees as well as the total number of employees who have maximum total earnings. Then print these values as 2 space-separated integers.
+SELECT 
+salary*months AS earnings
+, COUNT(employee_id)
+FROM employee 
+GROUP BY 1 
+ORDER BY COUNT(employee_id) DESC
+LIMIT 1;
+
+--Query the following two values from the STATION table:The sum of all values in LAT_N rounded to a scale of  decimal places.The sum of all values in LONG_W rounded to a scale of  decimal places.
+SELECT 
+ROUND(SUM(lat_n),2)
+, ROUND(SUM(long_w),2)
+FROM station
+
+--Query the sum of Northern Latitudes (LAT_N) from STATION having values greater than  and less than . Truncate your answer to  decimal places.
+SELECT 
+TRUNCATE(SUM(lat_n),4)
+FROM station 
+WHERE lat_n > 38.7880 AND lat_n < 137.2345
+
+--Query the greatest value of the Northern Latitudes (LAT_N) from STATION that is less than . Truncate your answer to  decimal places.
+SELECT 
+TRUNCATE(MAX(lat_n),4)
+FROM station 
+WHERE lat_n < 137.2345
+
+--Query the Western Longitude (LONG_W) for the largest Northern Latitude (LAT_N) in STATION that is less than . Round your answer to  decimal places.
+SELECT 
+ROUND(long_w,4)
+FROM 
+station
+WHERE 
+lat_n < 137.2345
+ORDER BY lat_n DESC 
+LIMIT 1
+
+--Query the smallest Northern Latitude (LAT_N) from STATION that is greater than . Round your answer to  decimal places.
+SELECT 
+ROUND(MIN(lat_n),4)
+FROM station 
+WHERE lat_n > 38.7780
+
+--Query the Western Longitude (LONG_W)where the smallest Northern Latitude (LAT_N) in STATION is greater than . Round your answer to  decimal places.
+SELECT 
+ROUND(long_w,4)
+FROM station 
+WHERE lat_n > 38.7780
+ORDER BY lat_n ASC
+LIMIT 1;
+
+
+--Given the CITY and COUNTRY tables, query the sum of the populations of all cities where the CONTINENT is 'Asia'.
+SELECT 
+SUM(ct.population)
+FROM city ct
+INNER JOIN country cy
+ON ct.countrycode = cy.code 
+WHERE cy.continent = 'Asia'
+
+--Given the CITY and COUNTRY tables, query the names of all cities where the CONTINENT is 'Africa'.
+SELECT 
+ct.name
+FROM city ct
+INNER JOIN country cy
+ON ct.countrycode = cy.code 
+WHERE cy.continent = 'Africa'
+
+
+--Given the CITY and COUNTRY tables, query the names of all the continents (COUNTRY.Continent) and their respective average city populations (CITY.Population) rounded down to the nearest integer
+SELECT 
+cy.continent
+, FLOOR(AVG(ct.population))
+FROM city ct
+INNER JOIN country cy
+ON ct.countrycode = cy.code 
+GROUP BY cy.continent
+
+--Query an alphabetically ordered list of all names in OCCUPATIONS, immediately followed by the first letter of each profession as a parenthetical (i.e.: enclosed in parentheses). For example: AnActorName(A), ADoctorName(D), AProfessorName(P), and ASingerName(S).
+Query the number of ocurrences of each occupation in OCCUPATIONS. Sort the occurrences in ascending order, and output them in the following format:
+where [occupation_count] is the number of occurrences of an occupation in OCCUPATIONS and [occupation] is the lowercase occupation name. If more than one Occupation has the same [occupation_count], they should be ordered alphabetically.
+
+SELECT 
+CONCAT(name,'(',SUBSTRING(Occupation,1,1),')')
+FROM occupations
+ORDER BY name ; 
+
+SELECT 
+CONCAT ('There are a total of ',COUNT(occupation),' ',LOWER(occupation),'s.')
+FROM occupations
+GROUP BY occupation
+ORDER BY COUNT(occupation) ASC, occupation ASC ;
+
+--A median is defined as a number separating the higher half of a data set from the lower half. Query the median of the Northern Latitudes (LAT_N) from STATION and round your answer to  decimal places.
+SELECT 
+ROUND(T.LAT_N,4)
+FROM( 
+       SELECT 
+        LAT_N
+        ,row_number() over(ORDER BY lat_n ASC) as rn_asc
+        ,row_number() over(ORDER BY lat_n DESC) as rn_desc
+        FROM STATION
+        ORDER BY lat_n
+        ) AS T 
+WHERE T.rn_asc = T.rn_desc
+
+--Pivot the Occupation column in OCCUPATIONS so that each Name is sorted alphabetically and displayed underneath its corresponding Occupation. The output column headers should be Doctor, Professor, Singer, and Actor, respectively.
+SELECT 
+[Doctor]
+,[Professor]
+,[Singer]
+,[Actor]
+FROM (SELECT * ,
+                ROW_NUMBER()OVER(PARTITION BY Occupation ORDER BY(SELECT Name)) RN 
+        FROM occupations
+) as t
+PIVOT(
+        MAX(Name) FOR Occupation IN ([Doctor],[Professor],[Singer],[Actor])
+)as pvt
+
+--You are given a table, BST, containing two columns: N and P, where N represents the value of a node in Binary Tree, and P is the parent of N.
+select N, 
+CASE
+    when P is null then 'Root'
+    when N in (select P from BST) then 'Inner'
+    else 'Leaf'
+    end
+from BST
+order by n
+;
+
+--Given the table schemas below, write a query to print the company_code, founder name, total number of lead managers, total number of senior managers, total number of managers, and total number of employees. Order your output by ascending company_code.
+SELECT 
+c.company_code 
+, c.founder
+, COUNT(DISTINCT lm.lead_manager_code)
+, COUNT(DISTINCT sm.senior_manager_code)
+, COUNT(DISTINCT m.manager_code)
+, COUNT(DISTINCT e.employee_code)
+FROM company c
+INNER JOIN lead_manager lm 
+ON c.company_code = lm.company_code 
+INNER JOIN senior_manager sm 
+ON lm.company_code = sm.company_code 
+INNER JOIN manager m 
+ON sm.company_code = m.company_code 
+INNER JOIN employee e
+ON m.company_code = e.company_code 
+GROUP BY c.company_code, c.founder
+ORDER BY c.company_code
+
+
+
+
+
+
+
+
+
+
+
+
+
