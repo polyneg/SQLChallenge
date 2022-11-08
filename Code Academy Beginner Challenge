@@ -1,0 +1,75 @@
+--The challenge is to write a SQL query for this table that’ll return all the opposites of the values in the Value column. If a number is negative, make it positive and vice versa.
+SELECT 
+number
+, CASE 
+	WHEN number < 0 THEN ABS(number) 
+    ELSE number *-1 
+    END AS opposite_number
+FROM opposite;
+
+--Your task is to write a query for this table that’ll return just the division ids for all the divisions that had positive revenue in 2021.
+SELECT 
+id 
+FROM revenue
+WHERE revenue > 0
+	AND year = 2021
+GROUP BY id
+
+--Write a query for the table above that’ll return the century that the year is in.
+SELECT 
+year
+, ROUND(
+	((year + 150)/100) -1
+) AS century
+FROM century
+
+--Return whether or not the number in the Value column is even or odd rather than returning the number itself.
+SELECT 
+value
+, CASE 
+	WHEN MOD(value,2) > 0 THEN 'odd' 
+    ELSE 'even'
+    END AS result
+FROM even_odd
+
+--The challenge is to write a query that’ll group all the people by their age, along with a count of the people that are the same age.
+SELECT 
+value
+, COUNT(value)
+FROM age
+GROUP BY 1
+ORDER BY 1 ASC
+
+
+--Your challenge is to return a result set that has a column called Greeting in it. This column will take the value from the Name column and return a string like this, with the name inserted into it:
+SELECT 
+concat('Hi',' ',name,'!',' ','Have a great day')
+FROM age
+
+
+--Write a query that returns only the top five selling items in the table.
+SELECT 
+product
+, amount
+FROM products
+ORDER BY amount DESC 
+LIMIT 5;
+
+--The challenge here is to assume that you’re a Canadian border guard. Citizens from the United States and Canada don’t need a passport to cross the border. Write a query to find all the names that need a passport to cross.
+SELECT 
+name
+, country
+FROM passport
+WHERE country NOT LIKE 'United States'
+AND country NOT LIKE 'Canada'
+
+--For this challenge, write a query that’ll return all unique ages from the table. Your result should have these values:
+SELECT distinct
+value
+FROM age
+ORDER BY 1 ASC
+
+--Your task for this challenge is to return a sum of all the ages in the table. Your query should return 139.
+SELECT
+SUM(value) as sum_of_ages
+FROM age
